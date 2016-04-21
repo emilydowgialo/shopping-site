@@ -10,6 +10,8 @@ Authors: Joel Burton, Christian Fernandez, Meggie Mahnken.
 from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
+from flask_debugtoolbar import DebugToolbarExtension
+
 import melons
 
 
@@ -74,36 +76,45 @@ def shopping_cart():
     return render_template("cart.html")
 
 
-@app.route("/add_to_cart/<int:id>")
-def add_to_cart(id):
+@app.route("/add_to_cart/<int:melon_id>")
+def add_to_cart(melon_id):
     """Add a melon to cart and redirect to shopping cart page.
+
+    This will not send the user to the page "add_to_cart", it will redirect.
 
     When a melon is added to the cart, redirect browser to the shopping cart
     page and display a confirmation message: 'Successfully added to cart'.
     """
 
-    shopping_cart = {}
+    # if cart not found in session, if not found returns None
+    if not session.get("cart"):
+        session["cart"] = []
 
-    qty = 0
+    # find key cart in session, append melon_id to key's value
+    session["cart"].append(melon_id)
 
-    if id in shopping_cart:
+    print session["cart"]
+
+
+
+
+
+
+
+
+
+
+    # if id in shopping_cart:
         # append melon id: quantity as key-value pair to the shopping dict
-        qty += 1
-        flash("Successfully added to cart")
-    else: 
-        mel_values = melons.get_by_id(id)
+    #     qty += 1
+    #     flash("Successfully added to cart")
+    # else: 
+    #     mel_values = melons.get_by_id(id)
         # append a value called qty to the melon_types dictionary
         # melon_types is a dict that comes from melons.py
-        shopping_cart[id] = mel_values
+        # shopping_cart[id] = mel_values
 
-    # adding key-value pair to the session dict 
-    # if session:
-    #     session[cart_id] = melon_id.append
-    #     flash("Successfully added to cart")
-    # else:
-    #     session[cart_id] = []
-
-    return render_template("cart.html")
+    return redirect("/cart")
 
     # TODO: Finish shopping cart functionality
 
@@ -144,4 +155,6 @@ def checkout():
 
 
 if __name__ == "__main__":
+    app.debug = True
+    DebugToolbarExtension(app)
     app.run(debug=True)
